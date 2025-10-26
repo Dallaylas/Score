@@ -1,6 +1,6 @@
 {
   "left": 0,
   "right": 0,
-  "cmd": "reset",
-  "start": 0
+  "cmd": "run",
+  "start": 60
 }
