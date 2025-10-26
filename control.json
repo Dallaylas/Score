@@ -1,6 +1,6 @@
 {
-  "left": 0,
+  "left": 1,
   "right": 2,
-  "cmd": "pause",
+  "cmd": "run",
   "start": 120
 }
