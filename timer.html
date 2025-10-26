@@ -1,0 +1,76 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>
+  html,body{
+    margin:0;
+    background:transparent;
+  }
+  #t{
+    color:#fff;
+    font:700 48px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    text-align:center;
+  }
+</style></head><body>
+<div id="t">00:00</div>
+<script>
+/* === CONFIG FROM URL === */
+const qs = n => new URLSearchParams(location.search).get(n);
+let mode   = (qs('mode')||'up');            // 'up' or 'down'
+let start  = parseInt(qs('start')||'0',10); // starting seconds (for count-up)
+let total  = parseInt(qs('sec')||'1200',10);// total seconds (for countdown)
+let s      = (mode==='up') ? start : total; // current seconds
+let state  = 'pause';                       // start paused
+
+const pad=n=>n.toString().padStart(2,'0');
+function render(){
+  const m = Math.floor(s/60);
+  const sec = s % 60;
+  t.textContent = `${pad(m)}:${pad(sec)}`;
+}
+render();
+
+/* === APPLY CONTROL FROM control.json === */
+function applyCtrl(j){
+  if(j.mode && (j.mode==='up' || j.mode==='down')) mode = j.mode;
+  if(typeof j.start === 'number') start = j.start|0;
+  if(typeof j.total === 'number') total = j.total|0;
+
+  if(j.cmd === 'reset'){
+    s = (mode==='up')? start : total;
+    render();
+    state = j.state || 'pause';
+  } else if(j.cmd === 'run'){
+    state = 'run';
+  } else if(j.cmd === 'pause'){
+    state = 'pause';
+  } else if(j.cmd === 'set' && typeof j.value === 'number'){
+    s = Math.max(0, j.value|0);
+    render();
+  } else if(j.cmd === 'bump' && typeof j.delta === 'number'){
+    s = Math.max(0, s + (j.delta|0));
+    render();
+  }
+}
+
+/* === POLL CONTROL FILE === */
+async function poll(){
+  try{
+    const res = await fetch('control.json?cache=' + Date.now());
+    if(res.ok){
+      const j = await res.json();
+      applyCtrl(j);
+    }
+  }catch(e){}
+}
+setInterval(poll, 500);
+
+/* === TICK EVERY SECOND === */
+setInterval(()=>{
+  if(state!=='run') return;
+  if(mode==='up'){
+    s++;
+  } else {
+    if(s>0){ s--; }
+  }
+  render();
+}, 1000);
+</script></body></html>
