@@ -1,1 +1,4 @@
-{"cmd":"run"}   // allowed: "run", "pause", "reset"
+{
+  "left": 0,
+  "right": 0
+}
