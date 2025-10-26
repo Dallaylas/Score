@@ -15,7 +15,7 @@
 const qs=n=>new URLSearchParams(location.search).get(n);
 const px = parseInt(qs('px')||'72',10);     // change font size via URL, e.g. ?px=90
 const sp = parseInt(qs('gap')||'56',10);    // change gap via URL, e.g. ?gap=80
-const y  = (qs('right')||'yellow');         // right score color, e.g. ?right=%23E6E600
+const y  = (qs('right')||'white');         // right score color, e.g. ?right=%23E6E600
 s.style.fontWeight='900';
 s.style.fontSize = px+'px';
 document.querySelector('.gap').style.width = sp+'px';
