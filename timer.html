@@ -1,51 +1,46 @@
 <!doctype html><html><head><meta charset="utf-8">
 <style>
-  html,body{margin:0;background:transparent;text-align:center}
-  #score{
-    color:#fff;
-    font:900 72px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    letter-spacing:2px;
+  html,body {
+    margin:0;
+    background:transparent;
+    text-align:center;
   }
-  #timer{
+  #timer {
     color:#E6E600;
-    font:700 48px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    margin-top:10px;
+    font:700 64px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   }
-  .gap{display:inline-block;width:56px;}
 </style></head><body>
-<div id="score"><span id="l">0</span><span class="gap"></span><span id="r">0</span></div>
 <div id="timer">00:00</div>
 
 <script>
-const pad=n=>n.toString().padStart(2,'0');
-let s=0, state='pause';  // seconds + run/pause
+const pad = n => n.toString().padStart(2,'0');
+let s = 0;          // current seconds
+let state = 'pause'; // run / pause
 
-async function poll(){
-  try{
-    const res = await fetch('control.json?cache='+Date.now());
-    if(res.ok){
+// fetch control.json and apply
+async function poll() {
+  try {
+    const res = await fetch('control.json?cache=' + Date.now());
+    if (res.ok) {
       const j = await res.json();
-
-      // --- Scores ---
-      if(typeof j.left  === 'number')  document.getElementById('l').textContent = j.left;
-      if(typeof j.right === 'number')  document.getElementById('r').textContent = j.right;
-
-      // --- Commands ---
-      if(j.cmd === 'reset'){ s = 0; state='pause'; render(); }
-      else if(j.cmd === 'run'){ state='run'; }
-      else if(j.cmd === 'pause'){ state='pause'; }
+      if (j.cmd === 'reset') { s = 0; state = 'pause'; render(); }
+      else if (j.cmd === 'run') { state = 'run'; }
+      else if (j.cmd === 'pause') { state = 'pause'; }
     }
-  }catch(e){}
+  } catch(e) {}
 }
 setInterval(poll, 500);
 
-function render(){
-  const m=Math.floor(s/60), sec=s%60;
-  timer.textContent=`${pad(m)}:${pad(sec)}`;
+// update display
+function render() {
+  const m = Math.floor(s / 60), sec = s % 60;
+  timer.textContent = `${pad(m)}:${pad(sec)}`;
 }
-setInterval(()=>{
-  if(state!=='run') return;
+
+// tick every second
+setInterval(() => {
+  if (state !== 'run') return;
   s++;
   render();
-},1000);
+}, 1000);
 </script></body></html>
